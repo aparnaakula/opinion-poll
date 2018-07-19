@@ -1,6 +1,6 @@
 package com.mycapstone.opinionpoll.controllers;
 
-import com.mycapstone.opinionpoll.models.Post;
+import com.mycapstone.opinionpoll.models.Query;
 import com.mycapstone.opinionpoll.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,12 +17,12 @@ public class HomeController {
 
     @RequestMapping("/")
     public String index(Model model) {
-        List<Post> latest5Posts = postService.findLatest5();
-        model.addAttribute("latest5posts", latest5Posts);
+        List<Query> latest5Queries = postService.findLatest5();
+        model.addAttribute("latest5posts", latest5Queries);
 
-        List<Post> latest3Posts = latest5Posts.stream()
+        List<Query> latest3Queries = latest5Queries.stream()
                 .limit(3).collect(Collectors.toList());
-        model.addAttribute("latest3posts", latest3Posts);
+        model.addAttribute("latest3posts", latest3Queries);
 
         return "index";
     }

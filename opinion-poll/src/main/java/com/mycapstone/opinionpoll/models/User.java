@@ -1,17 +1,13 @@
 package com.mycapstone.opinionpoll.models;
 
 
-import com.sun.javafx.beans.IDProperty;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -38,7 +34,7 @@ public class User {
     @NotNull
     private String lastName;
 
-    private Set<Post> posts = new HashSet<>();
+    private Set<Query> queries = new HashSet<>();
 
 
 
@@ -57,12 +53,12 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
     }
-    public Set<Post> getPosts() {
-        return posts;
+    public Set<Query> getQueries() {
+        return queries;
     }
 
-    public void setPosts(Set<Post> posts) {
-        this.posts = posts;
+    public void setQueries(Set<Query> queries) {
+        this.queries = queries;
     }
 
     public int getId() {

@@ -1,7 +1,6 @@
 package com.mycapstone.opinionpoll.controllers;
 
 import com.mycapstone.opinionpoll.models.User;
-import com.mycapstone.opinionpoll.repositories.UserRepository;
 import com.mycapstone.opinionpoll.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,7 +12,7 @@ import java.security.Principal;
 
 //
 //import com.mycapstone.opinionpoll.models.User;
-//import com.mycapstone.opinionpoll.models.UserDao;
+//import com.mycapstone.opinionpoll.models.data.UserDao;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.web.bind.annotation.ModelAttribute;
 //
@@ -47,37 +46,4 @@ import java.security.Principal;
 //    }
 //
 //}
-@Controller
-public abstract class AbstractController {
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    protected UserRepository userRepository;
-
-    protected static final String MESSAGE_KEY = "message";
-
-    @ModelAttribute("user")
-    public User getLoggedInUser(Principal principal) {
-        if (principal != null)
-            return userService.findByEmail(principal.getName());
-        return null;
-    }
-    public static final String userSessionKey = "user_id";
-
-    protected User getUserFromSession(HttpSession session) {
-        Integer userId = (Integer) session.getAttribute(userSessionKey);
-        return userId == null ? null : userRepository.findOne(userId);
-    }
-
-    protected void setUserInSession(HttpSession session, User user) {
-        session.setAttribute(userSessionKey, user.getId());
-    }
-
-    @ModelAttribute("user")
-    public User getUserForModel(HttpServletRequest request) {
-        return getUserFromSession(request.getSession());
-    }
-
-}
+//}

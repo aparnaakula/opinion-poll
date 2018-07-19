@@ -1,13 +1,13 @@
 package com.mycapstone.opinionpoll.services;
-import com.mycapstone.opinionpoll.models.Post;
+import com.mycapstone.opinionpoll.models.Query;
 
 import java.util.List;
 
 public interface PostService {
-    List<Post> findAll();
-    List<Post> findLatest5();
-    Post findById(Long id);
-    Post create(Post post);
-    Post edit(Post post);
+    List<Query> findAll();
+    List<Query> findLatest5();
+    Query findById(Long id);
+    Query create(Query query);
+    Query edit(Query query);
     void deleteById(Long id);
 }
