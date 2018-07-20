@@ -6,8 +6,8 @@ import java.util.List;
 public interface PostService {
     List<Query> findAll();
     List<Query> findLatest5();
-    Query findById(Long id);
+    Query findById(int id);
     Query create(Query query);
     Query edit(Query query);
-    void deleteById(Long id);
+    void deleteById(int id);
 }

@@ -37,7 +37,7 @@ public class PostServiceStubImpl implements PostService {
     }
 
     @Override
-    public Query findById(Long id) {
+    public Query findById(int id) {
         return this.queries.stream()
                 .filter(p -> Objects.equals(p.getId(), id))
                 .findFirst()
@@ -63,7 +63,7 @@ public class PostServiceStubImpl implements PostService {
         throw new RuntimeException("Query not found: " + query.getId());
     }
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(int id) {
         for (int i = 0; i < this.queries.size(); i++) {
             if (Objects.equals(this.queries.get(i).getId(), id)) {
                 this.queries.remove(i);

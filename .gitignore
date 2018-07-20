@@ -1,2 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
 .gitignore
+src/main/java/com/mycapstone/opinionpoll/controllers/CategoryController.java
+src/main/java/com/mycapstone/opinionpoll/controllers/QueryController.java
+src/main/java/com/mycapstone/opinionpoll/models/Category.java
+src/main/java/com/mycapstone/opinionpoll/models/Query.java
+src/main/java/com/mycapstone/opinionpoll/models/data/
+src/main/resources/templates/queries/
