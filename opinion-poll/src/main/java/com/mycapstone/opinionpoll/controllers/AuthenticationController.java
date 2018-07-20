@@ -1,4 +1,5 @@
 package com.mycapstone.opinionpoll.controllers;
+
 import com.mycapstone.opinionpoll.forms.UserForm;
 import com.mycapstone.opinionpoll.user.EmailExistException;
 import com.mycapstone.opinionpoll.user.UserService;
@@ -18,32 +19,33 @@ import static com.mycapstone.opinionpoll.services.NotificationServiceImpl.NOTIFY
 @Controller
 public class AuthenticationController extends AbstractController {
 
-    @Autowired
-    private UserService userService;
-    @GetMapping(value = "/register")
-    public String registerForm(Model model) {
-        model.addAttribute(new UserForm());
-        model.addAttribute("title", "Register");
-        return "register";
-    }
+	@Autowired
+	private UserService userService;
 
-    @PostMapping(value = "/register")
-    public String register(@ModelAttribute @Valid UserForm userForm, Errors errors) {
+	@GetMapping(value = "/register")
+	public String registerForm(Model model) {
+		model.addAttribute(new UserForm());
+		model.addAttribute("title", "Register");
+		return "register";
+	}
 
-        if (errors.hasErrors())
-            return "register";
+	@PostMapping(value = "/register")
+	public String register(@ModelAttribute @Valid UserForm userForm, Errors errors) {
 
-        try {
-            userService.save(userForm);
-        } catch (EmailExistException e) {
-            errors.rejectValue("email", "email.alreadyexists", e.getMessage());
-            return "register";
-        }
+		if (errors.hasErrors())
+			return "register";
 
-        return "redirect:/";
-    }
+		try {
+			userService.save(userForm);
+		} catch (EmailExistException e) {
+			errors.rejectValue("email", "email.alreadyexists", e.getMessage());
+			return "register";
+		}
 
-    @GetMapping(value = "/login")
+		return "redirect:/";
+	}
+
+	@GetMapping(value = "/login")
     public String login(Model model, Principal user, String error, String logout) {
 
         if (user != null)
@@ -57,5 +59,4 @@ public class AuthenticationController extends AbstractController {
 
         return "login";
     }
-
 }

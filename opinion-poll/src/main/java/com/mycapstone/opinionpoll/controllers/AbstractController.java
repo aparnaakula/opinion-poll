@@ -13,7 +13,7 @@ public class AbstractController {
 
     @Autowired
     private UserDao userDao;
-
+ 
     /*
      * Other DAOs can be autowired here and they'll be available
      * to all classes extending AbstractController
@@ -23,7 +23,7 @@ public class AbstractController {
 
     protected User getUserFromSession(HttpSession session) {
         Integer userId = (Integer) session.getAttribute(userSessionKey);
-        return userId == null ? null : userDao.findOne(userId);
+        return userId == null ? null : userDao.findById(userId).get();
     }
 
     protected void setUserInSession(HttpSession session, User user) {

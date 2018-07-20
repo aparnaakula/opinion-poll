@@ -2,7 +2,7 @@ package com.mycapstone.opinionpoll;
 
 import com.mycapstone.opinionpoll.controllers.AbstractController;
 import com.mycapstone.opinionpoll.models.User;
-import com.mycapstone.opinionpoll.models.data.UserDao;
+import com.mycapstone.opinionpoll.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -16,7 +16,8 @@ import java.util.List;
 public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
 
     @Autowired
-    UserDao userDao;
+    UserRepository userRepository;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
 
@@ -29,7 +30,7 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
             Integer userId = (Integer) request.getSession().getAttribute(AbstractController.userSessionKey);
 
             if (userId != null) {
-                User user = userDao.findOne(userId);
+                User user = userRepository.findById(userId).get();
 
                 if (user != null)
                     return true;
