@@ -15,10 +15,10 @@
         <div class="date">
             <i>Posted on</i>
             <span th:text="${#dates.format(query.date, 'dd-MMM-yyyy')}">22-May-2016</span>
-            <span th:if="${query.author}" th:remove="tag">
+            <span th:if="${query.user}" th:remove="tag">
         <i>by</i>
-        <span th:text="${query.author.firstName != null ?
-                         query.author.firstName : query.author.lastName}">Svetlin Nakov</span>
+        <span th:text="${query.user.firstName != null ?
+                         query.user.firstName : query.user.lastName}">Svetlin Nakov</span>
         </span>
         </div>
         <p class="content" th:utext="${query.body}">Post content</p>

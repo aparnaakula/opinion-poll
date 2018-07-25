@@ -1,34 +1,39 @@
 package com.mycapstone.opinionpoll.user;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.mycapstone.opinionpoll.forms.UserForm;
 import com.mycapstone.opinionpoll.models.User;
 import com.mycapstone.opinionpoll.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-import lombok.AllArgsConstructor;
+import javax.transaction.Transactional;
+
 
 @Service
-@Transactional
-@AllArgsConstructor
- public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService {
 
- 	private final UserRepository userRepository;
+	@Autowired
+	private UserRepository userRepository;
 
- 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Transactional
 	@Override
 	public User save(UserForm userForm) throws EmailExistException {
 
 		User existingUser = userRepository.findByEmail(userForm.getEmail());
 		if (existingUser != null)
-			throw new EmailExistException("The email address " + userForm.getEmail() + " already exists in the system");
+			throw new EmailExistException("The email address "
+					+ userForm.getEmail() + " already exists in the system");
 
-		User newUser = new User();
-		newUser.setEmail(userForm.getEmail());
-		newUser.setLastName(userForm.getFullName());
-		newUser.setPwHash(userForm.getPassword());
+		User newUser = new User(
+				userForm.getEmail(),
+				userForm.getFullName(),
+				passwordEncoder.encode(userForm.getPassword()));
 		userRepository.save(newUser);
+
 		return newUser;
 	}
 

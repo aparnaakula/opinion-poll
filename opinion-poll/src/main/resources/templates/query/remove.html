@@ -11,7 +11,7 @@
 
     <div th:each="query : ${queries}" class="checkbox">
         <input type="checkbox" name="queryIds" th:value="${query.id}" th:id="${query.id}"/>
-        <label th:for="${query.id}" th:text="${query.name}"></label>
+        <label th:for="${query.id}" th:text="${query.title}"></label>
         <br />
     </div>
 

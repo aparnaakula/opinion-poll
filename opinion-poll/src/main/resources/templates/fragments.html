@@ -41,14 +41,14 @@
 <nav th:fragment="navigation">
     <nav>
         <a href="/">Home</a> |
-    <a href="queries/index">Post</a> |
-    <a href="queries/create">Create Post</a> |
-    <a href="users/index">user</a>
-    <a href="users/login">login</a> |
-    <a href="users/register">register</a>
+    <!--<a href="query/index">Post</a> |-->
+    <a href="query/add">Create Post</a> |
+    <!--<a href="users/index">user</a>-->
+    <a href="/login">login</a> |
+    <a href="/register">register</a>
     <div id="logged-in-info">
         <span>Hello, <b>(user)</b></span>
-        <form method="query" th:action="@{/users/logout}">
+        <form method="post" th:action="@{/login}">
             <input type="submit" value="Logout"/>
         </form>
     </div>

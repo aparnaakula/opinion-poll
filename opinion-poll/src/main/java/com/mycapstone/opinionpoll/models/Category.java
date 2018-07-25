@@ -31,5 +31,27 @@ public class Category {
     @JoinColumn(name = "category_id")
     private List<Query> queries = new ArrayList<>();
 
-    
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Query> getQueries() {
+        return queries;
+    }
+
+    public void setQueries(List<Query> queries) {
+        this.queries = queries;
+    }
 }

@@ -5,8 +5,9 @@ import com.mycapstone.opinionpoll.models.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
-@Repository
+import java.util.List;
+
+
 public interface UserService {
 	
 	public User save(UserForm userForm) throws EmailExistException;

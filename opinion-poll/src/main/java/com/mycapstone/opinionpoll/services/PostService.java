@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface PostService {
-	 
+
 	 List<Query> findAll();
 	    List<Query> findLatest5();
 	    Query findById(int id);

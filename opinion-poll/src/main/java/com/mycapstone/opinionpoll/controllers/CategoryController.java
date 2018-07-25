@@ -1,7 +1,7 @@
 package com.mycapstone.opinionpoll.controllers;
 
 import com.mycapstone.opinionpoll.models.Category;
-import com.mycapstone.opinionpoll.models.data.CategoryDao;
+import com.mycapstone.opinionpoll.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,13 +17,13 @@ import javax.validation.Valid;
 public class CategoryController {
 
 	@Autowired
-	private CategoryDao categoryDao;
+	private CategoryRepository categoryRepository;
 
 	// Request path: /cheese
 	@RequestMapping(value = "")
 	public String index(Model model) {
 
-		model.addAttribute("categories", categoryDao.findAll());
+		model.addAttribute("categories", categoryRepository.findAll());
 		model.addAttribute("title", "Categories");
 
 		return "category/index";
@@ -43,7 +43,7 @@ public class CategoryController {
 		if (errors.hasErrors()) {
 			return "category/add";
 		}
-		categoryDao.save(category);
+		categoryRepository.save(category);
 		return "redirect:";
 	}
 }

@@ -2,8 +2,8 @@ package com.mycapstone.opinionpoll.controllers;
 
 import com.mycapstone.opinionpoll.models.Category;
 import com.mycapstone.opinionpoll.models.Query;
-import com.mycapstone.opinionpoll.models.data.CategoryDao;
-import com.mycapstone.opinionpoll.models.data.QueryDao;
+import com.mycapstone.opinionpoll.repositories.CategoryRepository;
+import com.mycapstone.opinionpoll.repositories.QueryRepository;
 import com.mycapstone.opinionpoll.services.NotificationService;
 import com.mycapstone.opinionpoll.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,89 +20,114 @@ public class QueryController {
 	private PostService postService;
 
 	@Autowired
-	private QueryDao queryDao;
+	private QueryRepository queryRepository;
 	@Autowired
 	private NotificationService notifyService;
 
 	@Autowired
-	private CategoryDao categoryDao;
+	private CategoryRepository categoryRepository;
 
-	@RequestMapping("/queries/view/{id}")
-	public String view(@PathVariable("id") int id, Model model) {
-		Query query = postService.findById(id);
-		if (query == null) {
-			notifyService.addErrorMessage("Cannot find queries #" + id);
-			return "redirect:/";
-		}
-		model.addAttribute("queries", query);
-		return "queries/view";
-	}
 
-	@RequestMapping(value = "add", method = RequestMethod.GET)
-	public String displayAddQueryForm(Model model) {
+//	@RequestMapping("/query/view/{id}")
+//	public String view(@PathVariable("id") int id, Model model) {
+//		Query query = postService.findById(id);
+//		if (query == null) {
+//			notifyService.addErrorMessage("Cannot find query #" + id);
+//			return "redirect:/";
+//		}
+//		model.addAttribute("query", query);
+//		return "query/view";
+//	}
+
+	@GetMapping(value = "add")
+	public String displayAddQueryForm(Model model, @CookieValue(value="user", defaultValue = "none") String email) {
+
+//		if(email.equals("none")){
+//			return "redirect:/login";
+//		}
 		model.addAttribute("title", "Add Query");
-		model.addAttribute(new Query());
-		model.addAttribute("categories", categoryDao.findAll());
-		return "queries/add";
+		model.addAttribute("Query", new Query());
+		model.addAttribute("categories", categoryRepository.findAll());
+		return "query/add";
 	}
 
-	@RequestMapping(value = "add", method = RequestMethod.POST)
-	public String processAddQueryForm(@ModelAttribute @Valid Query newQuery, @RequestParam int categoryId,
-			Errors errors, Model model) {
+	@PostMapping(value = "add")
+	public String processAddQueryForm(@ModelAttribute @Valid Query query, @RequestParam int categoryId,
+									  Errors errors, Model model, @CookieValue(value="user", defaultValue = "none") String email) {
+
+		if(email.equals("none")){
+			return "redirect:/login";
+		}
 
 		if (errors.hasErrors()) {
 			model.addAttribute("title", "Add Query");
-			return "queries/add";
+			return "query/add";
 		}
 
-		Category cat = categoryDao.findById(categoryId).get();
-		newQuery.setCategory(cat);
-		queryDao.save(newQuery);
+		Category cat = categoryRepository.findById(categoryId).get();
+		query.setCategory(cat);
+		queryRepository.save(query);
 		return "redirect:";
 	}
 
-	@RequestMapping(value = "remove", method = RequestMethod.GET)
-	public String displayRemoveQueryForm(Model model) {
-		model.addAttribute("queries", queryDao.findAll());
+	@GetMapping(value = "remove")
+	public String displayRemoveQueryForm(Model model, @CookieValue(value="user", defaultValue = "none") String email) {
+
+//		if(email.equals("none")){
+//			return "redirect:/login";
+//		}
+		model.addAttribute("query", queryRepository.findAll());
 		model.addAttribute("title", "Remove Cheese");
-		return "cheese/remove";
+		return "query/remove";
 	}
 
-	@RequestMapping(value = "remove", method = RequestMethod.POST)
-	public String processRemoveQueryForm(@RequestParam int[] queryIds) {
+	@PostMapping(value = "remove")
+	public String processRemoveQueryForm(@RequestParam int[] queryIds, @CookieValue(value="user", defaultValue = "none") String email) {
+
+		if(email.equals("none")){
+			return "redirect:/login";
+		}
 
 		for (int queryId : queryIds) {
-			queryDao.deleteById(queryId);
+			queryRepository.deleteById(queryId);
 		}
 
 		return "redirect:";
 	}
 
-	@RequestMapping(value = "edit/{queryId}", method = RequestMethod.GET)
-	public String displayEditQueryForm(Model model, @PathVariable int queryId) {
+	@GetMapping(value = "edit/{queryId}")
+	public String displayEditQueryForm(Model model, @PathVariable int queryId, @CookieValue(value="user", defaultValue = "none") String email) {
+
+		if(email.equals("none")){
+			return "redirect:/login";
+		}
 
 		model.addAttribute("title", "Edit Query");
-		model.addAttribute("query", queryDao.findById(queryId));
-		model.addAttribute("categories", categoryDao.findAll());
-		return "queries/edit";
+		model.addAttribute("query", queryRepository.findById(queryId));
+		model.addAttribute("categories", categoryRepository.findAll());
+		return "query/edit";
 	}
 
-	@RequestMapping(value = "edit/{queryId}", method = RequestMethod.POST)
+	@PostMapping(value = "edit/{queryId}")
 	public String processEditForm(Model model, @PathVariable int queryId, @ModelAttribute @Valid Query newQuery,
-			@RequestParam int categoryId, Errors errors) {
+			@RequestParam int categoryId, Errors errors, @CookieValue(value="user", defaultValue = "none") String email) {
+
+		if(email.equals("none")){
+			return "redirect:/login";
+		}
 
 		if (errors.hasErrors()) {
 			model.addAttribute("title", "Add Query");
-			return "queries/edit";
+			return "query/edit";
 		}
 
-		Query editedQuery = queryDao.findById(queryId).get();
+		Query editedQuery = queryRepository.findById(queryId).get();
 		editedQuery.setTitle(newQuery.getTitle());
 		editedQuery.setBody(newQuery.getBody());
-		editedQuery.setCategory(categoryDao.findById(categoryId).get());
-		queryDao.save(editedQuery);
-		
-		return "redirect:/queries";
+		editedQuery.setCategory(categoryRepository.findById(categoryId).get());
+		queryRepository.save(editedQuery);
+
+		return "redirect:";
 	}
 
 }

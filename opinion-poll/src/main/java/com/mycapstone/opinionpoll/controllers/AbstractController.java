@@ -2,37 +2,26 @@ package com.mycapstone.opinionpoll.controllers;
 
 
 import com.mycapstone.opinionpoll.models.User;
-import com.mycapstone.opinionpoll.models.data.UserDao;
+import com.mycapstone.opinionpoll.repositories.UserRepository;
+import com.mycapstone.opinionpoll.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.security.Principal;
 
 public class AbstractController {
 
     @Autowired
-    private UserDao userDao;
- 
-    /*
-     * Other DAOs can be autowired here and they'll be available
-     * to all classes extending AbstractController
-     * */
+    UserService userService;
 
-    public static final String userSessionKey = "user_id";
-
-    protected User getUserFromSession(HttpSession session) {
-        Integer userId = (Integer) session.getAttribute(userSessionKey);
-        return userId == null ? null : userDao.findById(userId).get();
-    }
-
-    protected void setUserInSession(HttpSession session, User user) {
-        session.setAttribute(userSessionKey, user.getId());
-    }
+    protected static final String MESSAGE_KEY = "message";
 
     @ModelAttribute("user")
-    public User getUserForModel(HttpServletRequest request) {
-        return getUserFromSession(request.getSession());
+    public User getLoggedInUser(Principal principal) {
+        if (principal != null)
+            return userService.findByEmail(principal.getName());
+        return null;
     }
-
 }
