@@ -2,9 +2,10 @@ package com.mycapstone.opinionpoll.models;
 
 
 
-import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -16,6 +17,10 @@ import java.util.regex.Pattern;
 
 @Entity
 public class User extends AbstractEntity {
+
+    @Id
+    @GeneratedValue
+    private int id;
 
     @NotBlank
     private String email;
@@ -29,7 +34,6 @@ public class User extends AbstractEntity {
     @NotNull
     private Boolean enabled = true;
 
-    public User(String email, String password, Boolean enabled, boolean b, boolean b1, boolean b2, List<GrantedAuthority> authorities) {}
 
     public User(@NotBlank String email, @NotBlank String fullName, @NotBlank String password) {
 
@@ -49,10 +53,10 @@ public class User extends AbstractEntity {
 
 
 
-    public List<String> getQuery() {
-        ArrayList<String> queries = new ArrayList<>();
-        queries.add("ROLE_USER");
-        return queries;
+    public List<String> getRoles() {
+        ArrayList<String> roles = new ArrayList<>();
+        roles.add("ROLE_USER");
+        return roles;
     }
 
     public String getEmail() {

@@ -34,16 +34,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                         /*accountNonExpired*/ true,
                         /*credentialsNonExpired*/ true,
                         /*accountNonLocked*/ true,
-                        getAuthorities(user.getQuery()));
+                getAuthorities(user.getRoles()));
     }
 
-    private static List<GrantedAuthority> getAuthorities (List<String> queries) {
+    private static List<GrantedAuthority> getAuthorities (List<String> roles) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        for (String query : queries) {
-            authorities.add(new SimpleGrantedAuthority(query));
+        for (String role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role));
         }
         return authorities;
     }
+
 
 }
 

@@ -9,7 +9,9 @@ vertical-align: middle;
 padding: 0px 5px;
 font-size: 1.2em;
 }
-
+.list-group-item p {
+  margin-bottom: 0;
+}
 body>footer {
 background: #eee;
 padding: 5px;

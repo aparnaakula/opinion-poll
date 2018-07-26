@@ -4,130 +4,135 @@ import com.mycapstone.opinionpoll.models.Category;
 import com.mycapstone.opinionpoll.models.Query;
 import com.mycapstone.opinionpoll.repositories.CategoryRepository;
 import com.mycapstone.opinionpoll.repositories.QueryRepository;
-import com.mycapstone.opinionpoll.services.NotificationService;
-import com.mycapstone.opinionpoll.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
+
+import static com.mycapstone.opinionpoll.controllers.AbstractController.MESSAGE_KEY;
 
 @Controller
 public class QueryController {
-	@Autowired
-	private PostService postService;
+
 
 	@Autowired
 	private QueryRepository queryRepository;
-	@Autowired
-	private NotificationService notifyService;
 
 	@Autowired
 	private CategoryRepository categoryRepository;
 
 
-//	@RequestMapping("/query/view/{id}")
-//	public String view(@PathVariable("id") int id, Model model) {
-//		Query query = postService.findById(id);
-//		if (query == null) {
-//			notifyService.addErrorMessage("Cannot find query #" + id);
-//			return "redirect:/";
-//		}
-//		model.addAttribute("query", query);
-//		return "query/view";
-//	}
 
-	@GetMapping(value = "add")
-	public String displayAddQueryForm(Model model, @CookieValue(value="user", defaultValue = "none") String email) {
+    @GetMapping
+    public String listEvents(Model model) {
+        List<Query> allQueries = queryRepository.findAll();
+        model.addAttribute("queries", allQueries);
+        return "query/list";
+        }
 
-//		if(email.equals("none")){
-//			return "redirect:/login";
-//		}
-		model.addAttribute("title", "Add Query");
-		model.addAttribute("Query", new Query());
-		model.addAttribute("categories", categoryRepository.findAll());
-		return "query/add";
+    @GetMapping(value = "create")
+    public String displayCreateEventForm(Model model, HttpServletRequest request) {
+        model.addAttribute(new Query());
+        model.addAttribute("actionUrl", request.getRequestURI());
+        model.addAttribute("title", "Create Query");
+        model.addAttribute("categories", categoryRepository.findAll());
+		return "query/create-or-update";
 	}
 
-	@PostMapping(value = "add")
-	public String processAddQueryForm(@ModelAttribute @Valid Query query, @RequestParam int categoryId,
-									  Errors errors, Model model, @CookieValue(value="user", defaultValue = "none") String email) {
-
-		if(email.equals("none")){
-			return "redirect:/login";
-		}
+    @PostMapping(value = "create")
+    public String processAddQueryForm(@ModelAttribute @Valid Query query, Errors errors,
+                                      @RequestParam(name = "categories", required = false) List<Integer> categoryUids
+									  , Model model) {
 
 		if (errors.hasErrors()) {
 			model.addAttribute("title", "Add Query");
-			return "query/add";
+			return "query/create-or-update";
 		}
-
-		Category cat = categoryRepository.findById(categoryId).get();
-		query.setCategory(cat);
+		syncCategoryLists(categoryUids, query.getCategories());
 		queryRepository.save(query);
-		return "redirect:";
+
+
+		return "redirect:/query/detail/" + query.getUid();
 	}
+    @GetMapping(value = "detail/{uid}")
+    public String displayQueryDetails(@PathVariable int uid, Model model) {
 
-	@GetMapping(value = "remove")
-	public String displayRemoveQueryForm(Model model, @CookieValue(value="user", defaultValue = "none") String email) {
+        model.addAttribute("title", "Event Details");
 
-//		if(email.equals("none")){
-//			return "redirect:/login";
-//		}
-		model.addAttribute("query", queryRepository.findAll());
-		model.addAttribute("title", "Remove Cheese");
-		return "query/remove";
-	}
+        Optional<Query> result = queryRepository.findById(uid);
+        if (result.isPresent()) {
+            Query query = result.get();
+            model.addAttribute(query);
+            model.addAttribute("CategoryNames", query.getCategoriessFormatted());
+        } else {
+            model.addAttribute(MESSAGE_KEY, "warning|No event found with id: " + Integer.toString(uid));
+        }
 
-	@PostMapping(value = "remove")
-	public String processRemoveQueryForm(@RequestParam int[] queryIds, @CookieValue(value="user", defaultValue = "none") String email) {
+        return "query/details";
+    }
+    @GetMapping(value = "update/{uid}")
+    public String displayUpdateQueryForm(@PathVariable int uid, Model model, HttpServletRequest request) {
 
-		if(email.equals("none")){
-			return "redirect:/login";
-		}
+        model.addAttribute("title", "Update Event");
+        model.addAttribute("actionUrl", request.getRequestURI());
 
-		for (int queryId : queryIds) {
-			queryRepository.deleteById(queryId);
-		}
+        Optional<Query> query =queryRepository.findById(uid);
+        if (query.isPresent()) {
+            model.addAttribute(query.get());
+            model.addAttribute("volunteers", categoryRepository.findAll());
+        } else {
+            model.addAttribute(MESSAGE_KEY, "warning|No event found with id: " + Integer.toString(uid));
+        }
 
-		return "redirect:";
-	}
+        return "query/create-or-update";
+    }
 
-	@GetMapping(value = "edit/{queryId}")
-	public String displayEditQueryForm(Model model, @PathVariable int queryId, @CookieValue(value="user", defaultValue = "none") String email) {
+    @PostMapping(value = "update/{uid}")
+    public String processUpdateQueryForm(@Valid @ModelAttribute Query query,
+                                         RedirectAttributes model,
+                                         Errors errors,
+                                         @RequestParam(name = "categories", required = false) List<Integer> categoryUids) {
 
-		if(email.equals("none")){
-			return "redirect:/login";
-		}
+        if (errors.hasErrors())
+            return "query/create-or-update";
 
-		model.addAttribute("title", "Edit Query");
-		model.addAttribute("query", queryRepository.findById(queryId));
-		model.addAttribute("categories", categoryRepository.findAll());
-		return "query/edit";
-	}
+        syncCategoryLists(categoryUids, query.getCategories());
+        queryRepository.save(query);
+        model.addFlashAttribute(MESSAGE_KEY, "success|Updated Query: " + query.getTitle());
 
-	@PostMapping(value = "edit/{queryId}")
-	public String processEditForm(Model model, @PathVariable int queryId, @ModelAttribute @Valid Query newQuery,
-			@RequestParam int categoryId, Errors errors, @CookieValue(value="user", defaultValue = "none") String email) {
+        return "redirect:/query/detail/" + query.getUid();
+    }
 
-		if(email.equals("none")){
-			return "redirect:/login";
-		}
 
-		if (errors.hasErrors()) {
-			model.addAttribute("title", "Add Query");
-			return "query/edit";
-		}
+    @PostMapping(value = "delete/{uid}")
+    public String processDeleteQueryForm(@PathVariable int uid, RedirectAttributes model) {
 
-		Query editedQuery = queryRepository.findById(queryId).get();
-		editedQuery.setTitle(newQuery.getTitle());
-		editedQuery.setBody(newQuery.getBody());
-		editedQuery.setCategory(categoryRepository.findById(categoryId).get());
-		queryRepository.save(editedQuery);
+        Optional<Query> result = queryRepository.findById(uid);
+        if (result.isPresent()) {
+            queryRepository.delete(result.get());
+            model.addFlashAttribute(MESSAGE_KEY, "success|Event deleted");
+            return "redirect:/query";
+        } else {
+            model.addFlashAttribute(MESSAGE_KEY, "danger|Event with ID does not exist: " +  uid);
+            return "redirect:/query";
+        }
+    }
 
-		return "redirect:";
+	private void syncCategoryLists(List<Integer> categoryUids, List<Category> categories) {
+
+		if (categoryUids == null)
+			return;
+
+		List<Category> newCategoryList = (List<Category>) categoryRepository.findAllById(categoryUids);
+		categories.removeIf(v -> categoryUids.contains(v.getUid()));
+		categories.addAll(newCategoryList);
 	}
 
 }

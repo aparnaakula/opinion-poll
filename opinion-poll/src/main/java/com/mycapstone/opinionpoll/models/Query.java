@@ -1,19 +1,19 @@
 package com.mycapstone.opinionpoll.models;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-public class Query {
+
+public class Query extends AbstractEntity {
 
     @Id
     @GeneratedValue
@@ -28,8 +28,9 @@ public class Query {
 
     private Date date = new Date();
 
-    @ManyToOne
-    private Category category;
+    @ManyToMany
+    private List<Category> categories= new ArrayList<>();
+
 
     public int getId() {
         return id;
@@ -71,20 +72,49 @@ public class Query {
         this.date = date;
     }
 
-    public Category getCategory() {
-        return category;
+    public List<Category> getCategories() {
+        return categories;
     }
-
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
     }
-
     public Query() {
+    }
+
+    public Query(int id, String title, String body, Date date) {
+        if (title == null || title.length() == 0)
+            throw new IllegalArgumentException("Title may not be blank");
+
+        if (body == null || body.length() == 0)
+            throw new IllegalArgumentException("Description may not be null");
+
+
+        this.id = id;
+        this.title = title;
+        this.body = body;
+        this.date=date;
     }
 
     public Query(int id, String title, String body) {
         this.id = id;
         this.title = title;
         this.body = body;
+    }
+
+    public Query(int id, String title, String body, Date date, List<Category> categories) {
+        this(id,title,body,date);
+        this.addAllCategories(categories);
+    }
+    public void add(Category cat) {
+        this.categories.add(cat);
+    }
+
+    public void addAllCategories(List<Category> cats) {
+        this.categories.addAll(cats);
+    }
+
+    public String getCategoriessFormatted() {
+        List<String> nameList = this.getCategories().stream().map(Category::getName).collect(Collectors.toList());
+        return String.join(", ", nameList);
     }
 }
